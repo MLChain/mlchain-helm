@@ -29,7 +29,7 @@ jobs:
 
       - name: Add dependency chart repos
         run: |
-          helm repo add douban https://mlchain.github.io/mlchain-helm/
+          helm repo add mlchain https://mlchain.github.io/mlchain-helm/
           
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.0.0-rc.2
