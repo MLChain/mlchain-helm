@@ -4,32 +4,34 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'charts/mlchain/Chart.yaml'
-  workflow_dispatch: # Add this section to enable manual triggering
-
-permissions:
-  contents: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v2
+
+      - name: Fetch history
+        run: git fetch --prune --unshallow
 
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Update dependency
-        run: find charts -mindepth 1 -maxdepth 1 -type d | xargs -I{} echo helm dependency update {}
-    
+      # See https://github.com/helm/chart-releaser-action/issues/6
+      - name: Install Helm
+        run: |
+          curl -fsSLo get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+
+      - name: Add dependency chart repos
+        run: |
+          helm repo add douban https://mlchain.github.io/mlchain-helm/
+          
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.2.1
+        uses: helm/chart-releaser-action@v1.0.0-rc.2
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
