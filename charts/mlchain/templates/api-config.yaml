@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "mlchain.api.fullname" . }}
-data:
-  {{- include "mlchain.api.config" . | nindent 2 }}
